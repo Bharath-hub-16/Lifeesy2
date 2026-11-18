@@ -1,0 +1,46 @@
+/* One still, full-page canvas. All section art and content sit above it. */
+html { background: #06133e; }
+body { background: transparent; }
+body::before {
+  content: '';
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background-color: #06133e;
+  background-image:
+    radial-gradient(ellipse at 77% 12%, rgba(39, 96, 210, .29), transparent 34%),
+    radial-gradient(ellipse at 18% 48%, rgba(33, 72, 154, .22), transparent 38%),
+    radial-gradient(ellipse at 82% 82%, rgba(30, 62, 135, .18), transparent 34%),
+    linear-gradient(128deg, #071333 0%, #091b51 49%, #07143c 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+#root { position: relative; z-index: 0; min-height: 100vh; }
+
+.nav-shell { background: rgba(5, 17, 52, .68); backdrop-filter: blur(22px) saturate(135%); }
+.hero,
+.products-section,
+.rewards-section,
+.journey-section,
+.participate-section,
+.terms-section,
+.footer { background: transparent; }
+.products-section::before { display: none; }
+.values-band { background: rgba(13, 34, 84, .24); backdrop-filter: blur(12px); }
+.closing-cta { background: rgba(7, 20, 60, .28); backdrop-filter: blur(8px); }
+.footer { background: rgba(4, 12, 37, .22); }
+
+.prize-stage { backdrop-filter: blur(18px) saturate(125%); background: linear-gradient(145deg, rgba(30, 79, 170, .78), rgba(8, 29, 89, .84) 55%, rgba(21, 56, 132, .78)); }
+.floating-note { backdrop-filter: blur(18px) saturate(125%); }
+.product-card { background: linear-gradient(145deg, rgba(16, 47, 123, .75), rgba(9, 29, 84, .72)); backdrop-filter: blur(14px); }
+.reward-card { background: linear-gradient(145deg, rgba(18, 55, 127, .76), rgba(9, 28, 81, .75)); backdrop-filter: blur(14px); }
+.month-selector { background: linear-gradient(135deg, rgba(13, 43, 115, .72), rgba(9, 30, 87, .7)); backdrop-filter: blur(14px); }
+.month-detail { background: linear-gradient(110deg, rgba(18, 54, 127, .78), rgba(10, 32, 93, .73) 75%); backdrop-filter: blur(15px); }
+.fee-card, .detail-panel, .terms-box { backdrop-filter: blur(16px) saturate(125%); }
+.major-strip { background: linear-gradient(110deg, rgba(7, 25, 79, .8), rgba(14, 52, 127, .74)); backdrop-filter: blur(16px); }
+.step-card { backdrop-filter: blur(9px); }
+
+@media (prefers-reduced-motion: reduce) {
+  body::before { scroll-behavior: auto; }
+}
