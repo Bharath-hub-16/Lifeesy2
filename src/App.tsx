@@ -1,11 +1,39 @@
 import { useState, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown, ArrowDownRight, ArrowRight, Bike, Check, ChevronDown, CircleDollarSign, Clock3, Gift, House, Menu, Monitor, Package, ShieldCheck, Sparkles, Trophy, X, CarFront } from 'lucide-react'
+import { ArrowDown, ArrowDownRight, ArrowRight, Bike, Check, ChevronDown, CircleDollarSign, Clock3, Gift, Menu, Monitor, Package, ShieldCheck, Sparkles, Trophy, X } from 'lucide-react'
 import { months, products, productImages, terms } from './data'
 
 const rise = { hidden: { opacity: 0, y: 30, scale: .97, filter: 'blur(5px)' }, show: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' } }
 const stagger = { hidden: {}, show: { transition: { staggerChildren: .075 } } }
 const termHeadings = ['Membership and product choice', 'Participation ID', 'Monthly scheme schedule', 'How results are shared', 'Multiple participation IDs', '43-inch TV after 24 months', 'Consolation prizes', 'Consolation prize confirmation', 'Monthly installment amount', 'Organisers’ decision']
+
+function getMonthVisuals(month: (typeof months)[number]) {
+  const features: { key: string; label: string; src?: string; alt: string; pairedVehicles?: boolean; pairedTvs?: boolean; scooterOnly?: boolean }[] = []
+  const scooterPattern = /activa|jupiter|access|rayzr|destini|ola s|ampere|zest|avenis|fascino|dio|pleasure|ntorq|qc1/i
+  const scooters = month.vehicle.filter((vehicle) => scooterPattern.test(vehicle))
+  const bikes = month.vehicle.filter((vehicle) => !scooterPattern.test(vehicle))
+
+  if (bikes.length || scooters.length) features.push({
+    key: 'vehicles',
+    label: bikes.length && scooters.length ? 'BIKES + SCOOTERS' : scooters.length ? 'SCOOTERS' : 'BIKES',
+    src: bikes.length ? '/prize-01.jpg' : undefined,
+    alt: bikes.length ? 'Motorcycle prize shown in the brochure' : 'Honda Activa scooter included in this month’s plan',
+    pairedVehicles: Boolean(bikes.length && scooters.length),
+    scooterOnly: Boolean(scooters.length && !bikes.length),
+  })
+  if (month.tv43 > 0 || month.tv75 > 0) features.push({
+    key: 'tv', label: 'SMART QLED TV', src: month.tv75 > 0 ? '/prize-06.jpg' : '/prize-04.jpg',
+    alt: month.tv43 > 0 && month.tv75 > 0 ? '43-inch and 75-inch Smart QLED TV prizes shown in the brochure' : `${month.tv75 > 0 ? '75-inch' : '43-inch'} Smart QLED TV prize shown in the brochure`,
+    pairedTvs: month.tv43 > 0 && month.tv75 > 0,
+  })
+  if (month.iphone) features.push({ key: 'iphone', label: 'IPHONE', src: '/prize-02.jpg', alt: 'iPhone prize shown in the brochure' })
+  if (month.major) features.push({
+    key: 'major', label: month.month === 24 ? '1 BHK HOUSE' : 'GRAND PRIZE',
+    src: month.month === 24 ? '/prize-03.jpg' : '/prize-05.jpg',
+    alt: month.month === 24 ? '1 BHK house prize shown in the brochure' : `Car prize: ${month.major}`,
+  })
+  return features
+}
 
 function Reveal({ children, className = '', delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
   return <motion.div className={className} variants={rise} initial="hidden" whileInView="show" viewport={{ once: true, amount: .12 }} transition={{ duration: .8, ease: [.22, 1, .36, 1], delay }}>{children}</motion.div>
@@ -16,7 +44,8 @@ function App() {
   const [openTerms, setOpenTerms] = useState<number | null>(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const active = months[activeMonth - 1]
-  const nav = [['Our story', '#about'], ['The products', '#products'], ['The rewards', '#rewards'], ['24-month plan', '#journey'], ['How to join', '#participate']]
+  const activeVisuals = getMonthVisuals(active)
+  const nav = [['Our story', '#about'], ['Products', '#products'], ['Rewards', '#rewards'], ['24-month plan', '#journey'], ['How to join', '#participate'], ['Contact', '#contact']]
 
   return <>
     <header className="nav-shell">
@@ -49,7 +78,7 @@ function App() {
           <div className="prize-stage">
             <div className="stage-copy"><span className="micro">THE LUCKY PLAN</span><b>A journey<br />of rewards.</b><small>MONTH 01 — 24</small></div>
             <div className="showcase-tv"><div className="tv-glint"/><div className="tv-image"><span>24</span><small>MONTHS OF POSSIBILITY</small></div><div className="tv-foot"/></div>
-            <div className="showcase-phone"><div className="phone-lens"/><span>✦</span></div>
+            <div className="showcase-phone"><img className="showcase-iphone-img" src="/prize-02.jpg" alt="iPhone shown in the Lifessy brochure" /></div>
             <div className="showcase-bike"><Bike size={88} strokeWidth={1.05}/></div>
             <div className="showcase-label"><Sparkles size={14}/> Monthly prize plans <b>01 / 24</b></div>
           </div>
@@ -101,7 +130,7 @@ function App() {
               <div className="prize-line"><span className="prize-line-icon"><img src="/icon-iphone.png" alt=""/></span><div><b>{active.iphone}</b></div></div>
               {active.major&&<div className="prize-line prize-line-major"><span className="prize-line-icon"><img src={active.month===24?'/icon-house.png':'/icon-car.png'} alt=""/></span><div><b>{active.month===24?'1 BHK House (₹50 lakh worth)':`1 × Car: ${active.major}`}</b></div><Sparkles size={16}/></div>}
             </div><div className="month-controls"><button onClick={()=>setActiveMonth(activeMonth===1?24:activeMonth-1)}><ArrowRight className="prev-arrow" size={15}/> PREVIOUS</button><span>{String(activeMonth).padStart(2,'0')} / 24</span><button onClick={()=>setActiveMonth(activeMonth===24?1:activeMonth+1)}>NEXT MONTH <ArrowRight size={15}/></button></div>
-          </div><div className="month-detail-visual"><div className="detail-orb"/>{active.major?(active.month===24?<House size={82}/>:<CarFront size={104}/>):active.tv43+active.tv75>0?<Monitor size={91}/>:<Bike size={95}/>}<span>{active.major?'A PRIZE TO REMEMBER':'A MONTH OF POSSIBILITIES'}</span></div>
+          </div><div className="month-detail-visual"><div className="detail-orb"/><div className="month-feature-grid">{activeVisuals.map((feature)=><div className="month-feature-tile" key={feature.key}>{feature.pairedVehicles?<div className="vehicle-pair"><img className="month-bike-photo" src={feature.src} alt={feature.alt} loading="lazy"/><img className="month-scooter-photo" src="/honda-activa110-banner.jpg" alt="Honda Activa scooter" loading="lazy"/></div>:feature.scooterOnly?<img className="month-feature-image month-scooter-photo" src="/honda-activa110-banner.jpg" alt="Honda Activa scooter" loading="lazy"/>:feature.pairedTvs?<div className="tv-pair"><img src="/prize-04.jpg" alt="43-inch Smart QLED TV" loading="lazy"/><img src="/prize-06.jpg" alt="75-inch Smart QLED TV" loading="lazy"/></div>:<img className="month-feature-image" src={feature.src} alt={feature.alt} loading="lazy"/>}<span>{feature.label}</span></div>)}</div><span className="month-feature-caption">{active.month===24?'GRAND FINALE':`MONTH ${String(active.month).padStart(2,'0')} · PRIZE HIGHLIGHTS`}</span></div>
         </motion.article></AnimatePresence>
         <div className="plan-footnote"><span><i/> MONTH-WISE PRIZE PLAN</span><span>Prize names, models and quantities as shown in the brochure.</span></div>
       </div></section>
@@ -124,6 +153,7 @@ function App() {
 
       <section className="closing-cta"><div className="closing-lines"/><Reveal><span className="eyebrow">YOUR DREAMS. YOUR REWARDS. YOUR JOURNEY.</span><h2>Twenty-four months.<br/><em>One journey with Lifessy.</em></h2><a className="button button-gold" href="#journey">Explore the month-wise plan <ArrowRight size={16}/></a><span className="closing-star">✳</span></Reveal></section>
     </main>
+    <section className="contact-section" id="contact"><div className="section-wrap contact-wrap"><div className="contact-heading"><span className="eyebrow">GET IN TOUCH</span><h2>Contact <em>Lifessy.</em></h2><p>Contact details will be added here soon.</p></div><div className="contact-fields"><label>Name<input type="text" name="name" placeholder="Name" autoComplete="name" /></label><label>Contact Number<input type="tel" name="contactNumber" placeholder="Contact Number" autoComplete="tel" /></label><label>Email Address<input type="email" name="email" placeholder="Email Address" autoComplete="email" /></label></div></div></section>
     <footer className="footer"><div className="footer-main"><a className="brand footer-brand" href="#top"><img className="brand-logo" src="/lifessy-logo.png" alt="Lifessy Corp logo" /></a><div className="footer-tagline">EMPOWERING DREAMS.<br/>BUILDING WEALTH.</div><div className="footer-nav">{nav.map(([label,href])=><a href={href} key={href}>{label}</a>)}</div><a className="footer-site" href="https://www.lifessy.in">WWW.LIFESSY.IN <ArrowUpRightIcon/></a></div><div className="footer-bottom"><span>© {new Date().getFullYear()} LIFESSY CORP</span><span>“Your Dreams. Your Rewards. Your Journey.”</span><a href="#top">BACK TO TOP ↑</a></div></footer>
   </>
 }
