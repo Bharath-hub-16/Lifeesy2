@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown, ArrowDownRight, ArrowRight, Bike, Check, ChevronDown, CircleDollarSign, Clock3, Gift, Menu, Monitor, Package, ShieldCheck, Sparkles, Trophy, X } from 'lucide-react'
+import { ArrowDown, ArrowDownRight, ArrowRight, Bike, Check, ChevronDown, CircleDollarSign, Clock3, Gift, Menu, Package, ShieldCheck, Sparkles, Trophy, X } from 'lucide-react'
 import { months, products, productImages, terms } from './data'
 
 const rise = { hidden: { opacity: 0, y: 30, scale: .97, filter: 'blur(5px)' }, show: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' } }
@@ -8,23 +8,21 @@ const stagger = { hidden: {}, show: { transition: { staggerChildren: .075 } } }
 const termHeadings = ['Membership and product choice', 'Participation ID', 'Monthly scheme schedule', 'How results are shared', 'Multiple participation IDs', '43-inch TV after 24 months', 'Consolation prizes', 'Consolation prize confirmation', 'Monthly installment amount', 'Organisers’ decision']
 
 function getMonthVisuals(month: (typeof months)[number]) {
-  const features: { key: string; label: string; src?: string; alt: string; pairedVehicles?: boolean; pairedTvs?: boolean; scooterOnly?: boolean }[] = []
+  const features: { key: string; label: string; src?: string; alt: string; scooterOnly?: boolean }[] = []
   const scooterPattern = /activa|jupiter|access|rayzr|destini|ola s|ampere|zest|avenis|fascino|dio|pleasure|ntorq|qc1/i
   const scooters = month.vehicle.filter((vehicle) => scooterPattern.test(vehicle))
   const bikes = month.vehicle.filter((vehicle) => !scooterPattern.test(vehicle))
 
   if (bikes.length || scooters.length) features.push({
     key: 'vehicles',
-    label: bikes.length && scooters.length ? 'BIKES + SCOOTERS' : scooters.length ? 'SCOOTERS' : 'BIKES',
+    label: bikes.length ? 'BIKES' : 'SCOOTERS',
     src: bikes.length ? '/prize-01.jpg' : undefined,
     alt: bikes.length ? 'Motorcycle prize shown in the brochure' : 'Honda Activa scooter included in this month’s plan',
-    pairedVehicles: Boolean(bikes.length && scooters.length),
     scooterOnly: Boolean(scooters.length && !bikes.length),
   })
   if (month.tv43 > 0 || month.tv75 > 0) features.push({
     key: 'tv', label: 'SMART QLED TV', src: month.tv75 > 0 ? '/prize-06.jpg' : '/prize-04.jpg',
     alt: month.tv43 > 0 && month.tv75 > 0 ? '43-inch and 75-inch Smart QLED TV prizes shown in the brochure' : `${month.tv75 > 0 ? '75-inch' : '43-inch'} Smart QLED TV prize shown in the brochure`,
-    pairedTvs: month.tv43 > 0 && month.tv75 > 0,
   })
   if (month.iphone) features.push({ key: 'iphone', label: 'IPHONE', src: '/prize-02.jpg', alt: 'iPhone prize shown in the brochure' })
   if (month.major) features.push({
@@ -82,8 +80,8 @@ function App() {
             <div className="showcase-bike"><Bike size={88} strokeWidth={1.05}/></div>
             <div className="showcase-label"><Sparkles size={14}/> Monthly prize plans <b>01 / 24</b></div>
           </div>
-          <div className="floating-note note-top"><span className="note-icon"><Trophy size={16}/></span><span><small>THE GRAND FINALE</small><b>1 BHK House</b></span></div>
-          <div className="floating-note note-bottom"><span className="note-icon"><Monitor size={16}/></span><span><small>SMART QLED TVs</small><b>43″ &amp; 75″</b></span></div>
+          <div className="floating-note note-top"><span className="note-product"><img src="/prize-03.jpg" alt=""/></span><span><small>THE GRAND FINALE</small><b>1 BHK House</b></span></div>
+          <div className="floating-note note-bottom"><span className="note-product"><img src="/prize-04.jpg" alt=""/></span><span><small>SMART QLED TVs</small><b>43″ &amp; 75″</b></span></div>
         </motion.div>
         <a className="scroll-hint" href="#about"><span>SCROLL TO EXPLORE</span><ArrowDownRight size={16}/></a>
         <div className="hero-bottom-rule" />
@@ -130,7 +128,7 @@ function App() {
               <div className="prize-line"><span className="prize-line-icon"><img src="/icon-iphone.png" alt=""/></span><div><b>{active.iphone}</b></div></div>
               {active.major&&<div className="prize-line prize-line-major"><span className="prize-line-icon"><img src={active.month===24?'/icon-house.png':'/icon-car.png'} alt=""/></span><div><b>{active.month===24?'1 BHK House (₹50 lakh worth)':`1 × Car: ${active.major}`}</b></div><Sparkles size={16}/></div>}
             </div><div className="month-controls"><button onClick={()=>setActiveMonth(activeMonth===1?24:activeMonth-1)}><ArrowRight className="prev-arrow" size={15}/> PREVIOUS</button><span>{String(activeMonth).padStart(2,'0')} / 24</span><button onClick={()=>setActiveMonth(activeMonth===24?1:activeMonth+1)}>NEXT MONTH <ArrowRight size={15}/></button></div>
-          </div><div className="month-detail-visual"><div className="detail-orb"/><div className="month-feature-grid">{activeVisuals.map((feature)=><div className="month-feature-tile" key={feature.key}>{feature.pairedVehicles?<div className="vehicle-pair"><img className="month-bike-photo" src={feature.src} alt={feature.alt} loading="lazy"/><img className="month-scooter-photo" src="/honda-activa110-banner.jpg" alt="Honda Activa scooter" loading="lazy"/></div>:feature.scooterOnly?<img className="month-feature-image month-scooter-photo" src="/honda-activa110-banner.jpg" alt="Honda Activa scooter" loading="lazy"/>:feature.pairedTvs?<div className="tv-pair"><img src="/prize-04.jpg" alt="43-inch Smart QLED TV" loading="lazy"/><img src="/prize-06.jpg" alt="75-inch Smart QLED TV" loading="lazy"/></div>:<img className="month-feature-image" src={feature.src} alt={feature.alt} loading="lazy"/>}<span>{feature.label}</span></div>)}</div><span className="month-feature-caption">{active.month===24?'GRAND FINALE':`MONTH ${String(active.month).padStart(2,'0')} · PRIZE HIGHLIGHTS`}</span></div>
+          </div><div className="month-detail-visual"><div className="detail-orb"/><div className="month-feature-grid">{activeVisuals.map((feature)=><div className="month-feature-tile" key={feature.key}>{feature.scooterOnly?<img className="month-feature-image month-scooter-photo" src="/honda-activa110-banner.jpg" alt="Honda Activa scooter" loading="lazy"/>:<img className="month-feature-image" src={feature.src} alt={feature.alt} loading="lazy"/>}<span>{feature.label}</span></div>)}</div><span className="month-feature-caption">{active.month===24?'GRAND FINALE':`MONTH ${String(active.month).padStart(2,'0')} · PRIZE HIGHLIGHTS`}</span></div>
         </motion.article></AnimatePresence>
         <div className="plan-footnote"><span><i/> MONTH-WISE PRIZE PLAN</span><span>Prize names, models and quantities as shown in the brochure.</span></div>
       </div></section>
@@ -145,7 +143,7 @@ function App() {
         ].map(([num,title,text],i)=><Reveal key={num} delay={i*.07}><article className="step-card"><span className="step-num">{num}</span><div><h3>{title}</h3><p>{text}</p></div><span className="step-icon">{i===0?<Package/>:i===1?<Check/>:i===2?<Clock3/>:<Trophy/>}</span></article></Reveal>)}</div>
       </div><div className="section-wrap participation-detail"><Reveal className="detail-panel"><span className="eyebrow">A FEW DETAILS TO KNOW</span><div className="detail-columns"><p><b>Monthly schedule</b><span>Pay ₹2,000/- every month before the 10th.</span></p><p><b>Participation ID</b><span>Your ID continues until the last month.</span></p><p><b>Dates, method &amp; eligibility</b><span>Dates, method, eligibility and prize claim and delivery process will be confirmed by Lifessy.</span></p></div></Reveal></div></section>
 
-      <section className="terms-section"><div className="section-wrap terms-wrap"><Reveal className="section-heading"><div><span className="eyebrow">06 / IMPORTANT CUSTOMER INFORMATION</span><h2>Clear details.<br/><em>Every step.</em></h2></div><p>Prize names, models and quantities are as shown on the monthly plan pages. Where a bike or scooter brand or iPhone model is not specified, Lifessy will confirm it.</p></Reveal>
+      <section className="terms-section"><div className="section-wrap terms-wrap"><Reveal className="section-heading"><div><span className="eyebrow">06 / IMPORTANT CUSTOMER INFORMATION</span><h2>Clear details.<br/><em>Every step.</em></h2></div></Reveal>
         <Reveal className="terms-box"><div className="terms-header"><span className="eyebrow">24 MONTHS — EVERY MONTH PRODUCT PURCHASE</span><span>10 TERMS</span></div>{terms.map((term,i)=><div className={`term-item ${openTerms===i?'term-open':''}`} key={term}><button onClick={()=>setOpenTerms(openTerms===i?null:i)} aria-expanded={openTerms===i}><span className="term-number">{String(i+1).padStart(2,'0')}</span><span>{termHeadings[i]}</span><ChevronDown size={17}/></button><AnimatePresence initial={false}>{openTerms===i&&<motion.div className="term-extra" initial={{height:0,opacity:0}} animate={{height:'auto',opacity:1}} exit={{height:0,opacity:0}} transition={{duration:.25}}><p>{term}</p></motion.div>}</AnimatePresence></div>)}
           <div className="terms-notes"><span className="note-star">✳</span><div><b>NOTE</b><p>Registration costs and applicable government fees for the vehicles shall be borne by the bumper prize winner.</p><p>Images of the prizes shown in the brochure are for illustrative purposes only and may differ from the actual prizes.</p><strong>Lifessy Lucky Only for Friends and Relatives</strong></div></div>
         </Reveal>

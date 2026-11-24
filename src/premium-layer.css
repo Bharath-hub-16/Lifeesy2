@@ -37,6 +37,9 @@ body::before {
 .hero-logo { filter: drop-shadow(0 9px 24px rgba(255,216,91,.17)); }
 .prize-stage { backdrop-filter: blur(18px) saturate(140%); background: linear-gradient(145deg,rgba(31,83,180,.82),rgba(8,29,89,.87) 55%,rgba(21,56,132,.83)); }
 .floating-note { backdrop-filter: blur(18px) saturate(140%); }
+.note-product { width: 52px; height: 40px; flex: 0 0 auto; display: grid; place-items: center; overflow: hidden; background: #fff; border: 1px solid rgba(255,255,255,.55); }
+.note-product img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.note-top .note-product { width: 68px; height: 50px; }
 
 /* Section-specific color fields sit above the stable page canvas. */
 .intro-section { display: block; position: relative; isolation: isolate; background: linear-gradient(105deg,rgba(47,36,133,.22),rgba(13,36,104,.08) 52%,rgba(7,19,59,.08)); }
@@ -193,3 +196,50 @@ body::before {
   .note-top { transform: scale(.66); }
   .note-bottom { transform: scale(.66); }
 }
+
+/* Larger supporting text across the site for easier reading. */
+.nav-links a, .nav-cta, .button, .text-link { font-size: 16px; }
+.eyebrow { font-size: 13px; }
+.hero-foot, .scroll-hint, .showcase-label, .showcase-label b, .footer-tagline,
+.footer-nav a, .footer-site, .footer-bottom, .small-note, .value-index,
+.product-number, .major-list small, .month-selector-top, .month-detail-title .eyebrow,
+.month-detail-title > b, .month-plan-head span, .line-count, .plan-footnote,
+.terms-header > span:last-child, .terms-notes b, .stage-copy .micro,
+.stage-copy small, .tv-image small, .floating-note small, .reward-label > span,
+.visual-caption, .house-value, .fee-card small, .fee-note, .major-pill,
+.month-controls button, .month-controls > span { font-size: 12px; }
+.floating-note b { font-size: 15px; }
+.intro-copy p, .value-card p, .section-heading > p, .participate-intro > p,
+.step-card p, .detail-columns span, .term-extra p, .terms-notes p,
+.contact-heading p { font-size: 17px; }
+.value-card h3, .product-card h3, .reward-label h3, .step-card h3,
+.detail-columns b, .terms-notes strong, .term-item button > span:nth-child(2) { font-size: 18px; }
+.month-plan-head h3 { font-size: 26px; }
+.prize-line b { font-size: 17px; }
+.prize-line p { font-size: 16px; }
+.month-feature-tile > span { font-size: 12px; min-height: 28px; }
+.month-detail-visual > .month-feature-caption { font-size: 12px; }
+
+@media (max-width: 760px) {
+  .nav-links a { font-size: 16px; }
+  .nav-cta, .button { font-size: 14px; }
+  .eyebrow { font-size: 12px; }
+  .hero-foot, .scroll-hint, .showcase-label, .showcase-label b,
+  .footer-tagline, .footer-nav a, .footer-site, .footer-bottom,
+  .small-note, .major-list small, .month-selector-top, .month-detail-title .eyebrow,
+  .month-detail-title > b, .month-plan-head span, .line-count, .plan-footnote,
+  .terms-header > span:last-child, .stage-copy .micro, .stage-copy small,
+  .tv-image small, .floating-note small, .reward-label > span, .major-pill,
+  .month-controls button, .month-controls > span { font-size: 11px; }
+  .section-heading > p, .intro-copy p, .value-card p, .participate-intro > p,
+  .step-card p, .detail-columns span, .term-extra p, .terms-notes p,
+  .contact-heading p { font-size: 16px; }
+  .product-card h3, .reward-label h3, .step-card h3, .detail-columns b,
+  .terms-notes strong, .term-item button > span:nth-child(2) { font-size: 16px; }
+  .month-plan-head h3 { font-size: 21px; }
+  .prize-line b { font-size: 15px; }
+  .prize-line p { font-size: 14px; }
+  .month-feature-tile > span { font-size: 11px; min-height: 25px; }
+  .month-detail-visual > .month-feature-caption { font-size: 11px; }
+}
+
