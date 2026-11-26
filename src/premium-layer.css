@@ -303,3 +303,26 @@ body::before {
 @media (max-width: 390px) {
   .hero-showcase { margin-inline: 0; }
 }
+
+/* Keep product indices legible above the product photography on phones. */
+@media (max-width: 760px) {
+  .product-visual { isolation: isolate; }
+  .product-number {
+    z-index: 2;
+    top: 8px;
+    right: 8px;
+    min-width: 30px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    padding: 0 6px;
+    color: #ffe991;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    background: rgba(6, 19, 62, .94);
+    border: 1px solid rgba(255, 216, 91, .6);
+    border-radius: 3px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .5);
+  }
+}
