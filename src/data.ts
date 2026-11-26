@@ -35,10 +35,10 @@ export const products = [
 ]
 
 export const productImages = [
-  '/products/product-05.jpg', '/products/product-06.jpg', '/products/product-13.jpg',
+  '/products/product-05.jpg', '/products/product-13.jpg', '/products/product-06.jpg',
   '/products/product-10.jpg', '/products/product-04.jpg', '/products/product-01.jpg',
   '/products/product-03.jpg', '/products/product-11.jpg', '/products/product-02.jpg',
-  '/products/product-14.jpg', '/products/product-09.jpg', '/products/product-12.jpg',
+  '/products/glamour-kit.jpeg', '/products/daily-care-kit.jpeg', '/products/product-12.jpg',
   '/products/product-08.jpg', '/products/product-07.jpg',
 ]
 

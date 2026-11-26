@@ -1,7 +1,10 @@
-import { useState, type ReactNode } from 'react'
+import { useCallback, useRef, useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown, ArrowDownRight, ArrowRight, Bike, Check, ChevronDown, CircleDollarSign, Clock3, Gift, Menu, Package, ShieldCheck, Sparkles, Trophy, X } from 'lucide-react'
+import { ArrowDown, ArrowDownRight, ArrowRight, Bike, Check, ChevronDown, CircleDollarSign, Clock3, Gift, MapPin, Menu, Package, ShieldCheck, Sparkles, Trophy, X } from 'lucide-react'
 import { months, products, productImages, terms } from './data'
+import ProductDetailsModal from './ProductDetailsModal'
+import ProductOverviewPlayer from './ProductOverviewPlayer'
+import { productDetails } from './product-details'
 
 const rise = { hidden: { opacity: 0, y: 30, scale: .97, filter: 'blur(5px)' }, show: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' } }
 const stagger = { hidden: {}, show: { transition: { staggerChildren: .075 } } }
@@ -41,14 +44,49 @@ function App() {
   const [activeMonth, setActiveMonth] = useState(1)
   const [openTerms, setOpenTerms] = useState<number | null>(0)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
+  const [overviewOpen, setOverviewOpen] = useState(false)
+  const productCardRefs = useRef<Array<HTMLElement | null>>([])
+  const returnFocusRef = useRef<HTMLElement | null>(null)
+  const overviewTriggerRef = useRef<HTMLElement | null>(null)
   const active = months[activeMonth - 1]
   const activeVisuals = getMonthVisuals(active)
-  const nav = [['Our story', '#about'], ['Products', '#products'], ['Rewards', '#rewards'], ['24-month plan', '#journey'], ['How to join', '#participate'], ['Contact', '#contact']]
+  const nav = [['Our story', '#about'], ['Products', '#products'], ['Product Showcase', '#products-overview'], ['Rewards', '#rewards'], ['24-month plan', '#journey'], ['How to join', '#participate'], ['Contact', '#contact']]
+  const footerNav = nav.filter(([, href]) => href !== '#products-overview')
+  const handleNavClick = (event: ReactMouseEvent<HTMLAnchorElement>, href: string) => {
+    setMenuOpen(false)
+    if (href === '#products-overview') {
+      event.preventDefault()
+      overviewTriggerRef.current = event.currentTarget
+      setOverviewOpen(true)
+    }
+  }
+  const openProductDetails = (id: string, index: number) => {
+    returnFocusRef.current = productCardRefs.current[index]
+    setSelectedProductId(id)
+  }
+  const closeProductDetails = useCallback(() => setSelectedProductId(null), [])
+  const restoreProductFocus = useCallback(() => {
+    window.requestAnimationFrame(() => returnFocusRef.current?.focus())
+  }, [])
+  const closeOverview = useCallback(() => setOverviewOpen(false), [])
+  const restoreOverviewFocus = useCallback(() => {
+    window.requestAnimationFrame(() => overviewTriggerRef.current?.focus())
+  }, [])
+  const selectedProductIndex = selectedProductId ? Number(selectedProductId.slice('product-'.length)) - 1 : -1
+  const selectedProductDetails = selectedProductId ? productDetails[selectedProductId] : undefined
+  const selectedProduct = selectedProductIndex >= 0 && selectedProductDetails ? {
+    id: selectedProductId!,
+    name: products[selectedProductIndex],
+    image: productImages[selectedProductIndex],
+    details: selectedProductDetails,
+    number: selectedProductIndex + 1,
+  } : null
 
   return <>
     <header className="nav-shell">
       <a className="brand" href="#top" aria-label="Lifessy Corp home"><img className="brand-logo" src="/lifessy-logo.png" alt="Lifessy Corp logo" /></a>
-      <nav className={menuOpen ? 'nav-links open' : 'nav-links'}>{nav.map(([label, href]) => <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}</a>)}</nav>
+      <nav className={menuOpen ? 'nav-links open' : 'nav-links'}>{nav.map(([label, href]) => <a key={href} href={href} onClick={(event) => handleNavClick(event, href)}>{label}</a>)}</nav>
       <a className="nav-cta" href="#journey">Explore the plan <ArrowRight size={15} /></a>
       <button className="menu-toggle" aria-label={menuOpen ? 'Close menu' : 'Open menu'} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
     </header>
@@ -98,7 +136,10 @@ function App() {
       <section className="products-section" id="products"><div className="section-wrap products-inner">
         <Reveal className="section-heading"><div><span className="eyebrow">02 / LIFESSY PRODUCT RANGE</span><h2>Choose a product.<br /><em>Begin the journey.</em></h2></div><p>Buy any products at ₹2,000 and get the benefits of the products.</p></Reveal>
         <motion.div className="product-grid" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: .1 }}>
-          {products.map((name,i)=><motion.article className={`product-card product-tone-${i%5}`} key={name} variants={rise} transition={{ duration: .5 }} whileHover={{ y: -5 }}><div className="product-visual"><div className="product-photo"><img src={productImages[i]} alt={name} loading="lazy" /></div><span className="product-number">{String(i+1).padStart(2,'0')}</span></div><h3>{name}</h3><span className="product-arrow"><ArrowDownRight size={14}/></span></motion.article>)}
+          {products.map((name,i)=>{
+            const id = `product-${String(i + 1).padStart(2, '0')}`
+            return <motion.article className={`product-card product-tone-${i%5}`} key={name} ref={(node) => { productCardRefs.current[i] = node }} role="button" tabIndex={0} aria-haspopup="dialog" aria-label={`Product ${String(i+1).padStart(2,'0')}: ${name}. Open product details.`} onClick={() => openProductDetails(id, i)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openProductDetails(id, i) } }} variants={rise} transition={{ duration: .5 }} whileHover={{ y: -5 }}><div className="product-visual"><div className="product-photo"><img src={productImages[i]} alt={name} loading="lazy" /></div><span className="product-number">{String(i+1).padStart(2,'0')}</span></div><h3>{name}</h3><span className="product-arrow"><ArrowDownRight size={14}/></span></motion.article>
+          })}
         </motion.div><p className="small-note"><span>14</span> products in the Lifessy range</p>
       </div></section>
 
@@ -151,8 +192,14 @@ function App() {
 
       <section className="closing-cta"><div className="closing-lines"/><Reveal><span className="eyebrow">YOUR DREAMS. YOUR REWARDS. YOUR JOURNEY.</span><h2>Twenty-four months.<br/><em>One journey with Lifessy.</em></h2><a className="button button-gold" href="#journey">Explore the month-wise plan <ArrowRight size={16}/></a><span className="closing-star">✳</span></Reveal></section>
     </main>
-    <section className="contact-section" id="contact"><div className="section-wrap contact-wrap"><div className="contact-heading"><span className="eyebrow">GET IN TOUCH</span><h2>Contact <em>Lifessy.</em></h2><p>Contact details will be added here soon.</p></div><div className="contact-fields"><label>Name<input type="text" name="name" placeholder="Name" autoComplete="name" /></label><label>Contact Number<input type="tel" name="contactNumber" placeholder="Contact Number" autoComplete="tel" /></label><label>Email Address<input type="email" name="email" placeholder="Email Address" autoComplete="email" /></label></div></div></section>
-    <footer className="footer"><div className="footer-main"><a className="brand footer-brand" href="#top"><img className="brand-logo" src="/lifessy-logo.png" alt="Lifessy Corp logo" /></a><div className="footer-tagline">EMPOWERING DREAMS.<br/>BUILDING WEALTH.</div><div className="footer-nav">{nav.map(([label,href])=><a href={href} key={href}>{label}</a>)}</div><a className="footer-site" href="https://www.lifessy.in">WWW.LIFESSY.IN <ArrowUpRightIcon/></a></div><div className="footer-bottom"><span>© {new Date().getFullYear()} LIFESSY CORP</span><span>“Your Dreams. Your Rewards. Your Journey.”</span><a href="#top">BACK TO TOP ↑</a></div></footer>
+    <section className="contact-section" id="contact"><div className="section-wrap contact-address-wrap"><div className="contact-address"><span className="contact-address-pin"><MapPin size={20}/></span><address><strong>LIFESSY CORP</strong><br/>#215, MGES, Thread Floor,<br/>5th Main Road,<br/>RPC Layout,<br/>Hampi Nagar, Bengaluru -560104</address></div></div></section>
+    <footer className="footer"><div className="footer-main"><a className="brand footer-brand" href="#top"><img className="brand-logo" src="/lifessy-logo.png" alt="Lifessy Corp logo" /></a><div className="footer-tagline">EMPOWERING DREAMS.<br/>BUILDING WEALTH.</div><div className="footer-nav">{footerNav.map(([label,href])=><a href={href} key={href}>{label}</a>)}</div><a className="footer-site" href="https://www.lifessy.in">WWW.LIFESSY.IN <ArrowUpRightIcon/></a></div><div className="footer-bottom"><span>© {new Date().getFullYear()} LIFESSY CORP</span><span>“Your Dreams. Your Rewards. Your Journey.”</span><a href="#top">BACK TO TOP ↑</a></div></footer>
+    <AnimatePresence onExitComplete={restoreOverviewFocus}>
+      {overviewOpen && <ProductOverviewPlayer key="products-overview-player" onExit={closeOverview} />}
+    </AnimatePresence>
+    <AnimatePresence onExitComplete={restoreProductFocus}>
+      {selectedProduct && <ProductDetailsModal key={selectedProduct.id} product={selectedProduct} onClose={closeProductDetails} />}
+    </AnimatePresence>
   </>
 }
 
